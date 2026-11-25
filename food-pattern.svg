@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="360" viewBox="0 0 360 360" fill="none">
+  <!-- Vegetables and desserts doodles. Tiles seamlessly; used as the page background pattern. -->
+  <g opacity="0.9">
+    <!-- tomato -->
+    <g transform="translate(52 58)">
+      <circle r="17" fill="#e4573d"/>
+      <path d="M-9 -13 L0 -9 L9 -13 L4 -6 L0 -4 L-4 -6Z" fill="#3f8a2b"/>
+      <path d="M-8 -4 q3 -6 9 -6" stroke="#fff" stroke-opacity=".45" stroke-width="2.4" stroke-linecap="round"/>
+    </g>
+    <!-- carrot -->
+    <g transform="translate(205 48) rotate(38)">
+      <path d="M0 0 C14 -10 44 -7 68 0 C44 7 14 10 0 0Z" fill="#f08a24"/>
+      <path d="M18 -4 l7 0 M34 3 l7 0 M46 -3 l6 0" stroke="#c9660f" stroke-width="2" stroke-linecap="round"/>
+      <path d="M0 0 C-8 -10 -16 -10 -22 -6 C-14 -4 -9 -2 0 0Z M0 0 C-10 -2 -18 4 -20 10 C-12 8 -7 5 0 0Z M0 0 C-8 6 -9 14 -6 20 C-2 12 -1 7 0 0Z" fill="#4c9a32"/>
+    </g>
+    <!-- leaf -->
+    <g transform="translate(300 40) rotate(-30)">
+      <path d="M0 0 C10 -22 34 -22 44 0 C34 22 10 22 0 0Z" fill="#6bb04a"/>
+      <path d="M2 0 H42" stroke="#3f8a2b" stroke-width="2" stroke-linecap="round"/>
+    </g>
+    <!-- broccoli -->
+    <g transform="translate(78 172)">
+      <rect x="-5" y="4" width="10" height="20" rx="4" fill="#8cc46a"/>
+      <circle cx="-12" cy="-2" r="12" fill="#3f8a2b"/>
+      <circle cx="0" cy="-12" r="13" fill="#4c9a32"/>
+      <circle cx="13" cy="-2" r="12" fill="#3f8a2b"/>
+      <circle cx="0" cy="3" r="11" fill="#58a83b"/>
+    </g>
+    <!-- donut -->
+    <g transform="translate(190 190)">
+      <circle r="21" fill="#e9b56c"/>
+      <path d="M-19 -3 C-18 -17 -4 -22 8 -20 C18 -18 22 -8 19 3 C14 -1 10 3 5 0 C0 5 -4 -1 -9 3 C-13 0 -16 4 -19 -3Z" fill="#f59ab7"/>
+      <circle r="6.5" fill="#fff8ea"/>
+      <path d="M-12 -10 l4 -2 M3 -16 l4 1 M10 -6 l3 3 M-14 2 l4 1" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+    </g>
+    <!-- cupcake -->
+    <g transform="translate(290 150)">
+      <path d="M-15 2 H15 L11 24 H-11Z" fill="#d9824b"/>
+      <path d="M-8 4 V22 M0 4 V22 M8 4 V22" stroke="#b9642f" stroke-width="1.8"/>
+      <path d="M-19 4 C-19 -8 -10 -10 -8 -14 C-6 -22 6 -22 8 -14 C10 -10 19 -8 19 4Z" fill="#f7a9c2"/>
+      <circle cx="0" cy="-24" r="4.5" fill="#d93a3a"/>
+    </g>
+    <!-- strawberry -->
+    <g transform="translate(42 282)">
+      <path d="M-17 -8 C-17 -18 17 -18 17 -8 C17 6 6 20 0 22 C-6 20 -17 6 -17 -8Z" fill="#e0384a"/>
+      <path d="M-9 -17 L0 -11 L9 -17 L5 -21 L0 -18 L-5 -21Z" fill="#3f8a2b"/>
+      <path d="M-7 -3 v3 M3 -4 v3 M9 3 v3 M-3 6 v3 M-10 6 v3" stroke="#fde7a8" stroke-width="2" stroke-linecap="round"/>
+    </g>
+    <!-- ice cream -->
+    <g transform="translate(150 292)">
+      <path d="M-13 -2 L13 -2 L0 30Z" fill="#e7b46a"/>
+      <path d="M-8 4 L8 4 M-5 12 L5 12" stroke="#c98d3d" stroke-width="1.6"/>
+      <circle cx="-6" cy="-8" r="11" fill="#f7a9c2"/>
+      <circle cx="7" cy="-10" r="11" fill="#fbe6a3"/>
+      <circle cx="0" cy="-22" r="4" fill="#d93a3a"/>
+    </g>
+    <!-- eggplant -->
+    <g transform="translate(262 276) rotate(28)">
+      <path d="M-12 -6 C-14 12 -4 28 6 26 C16 24 16 6 10 -6Z" fill="#6c3d8f"/>
+      <path d="M-12 -6 C-8 -12 6 -12 10 -6 C6 -2 -8 -2 -12 -6Z" fill="#3f8a2b"/>
+      <path d="M-1 -12 C0 -18 4 -20 6 -22" stroke="#3f8a2b" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <!-- mushroom -->
+    <g transform="translate(312 232)">
+      <path d="M-16 0 C-16 -18 16 -18 16 0Z" fill="#d9674a"/>
+      <circle cx="-6" cy="-8" r="2.4" fill="#fff"/><circle cx="5" cy="-11" r="2.4" fill="#fff"/><circle cx="8" cy="-5" r="2" fill="#fff"/>
+      <rect x="-6" y="0" width="12" height="14" rx="5" fill="#f4e3c3"/>
+    </g>
+    <!-- small leaves / sprinkles -->
+    <g transform="translate(120 112) rotate(60)"><path d="M0 0 C6 -14 22 -14 28 0 C22 14 6 14 0 0Z" fill="#8cc46a"/></g>
+    <g transform="translate(236 118) rotate(-20)"><path d="M0 0 C6 -12 20 -12 26 0 C20 12 6 12 0 0Z" fill="#6bb04a"/></g>
+    <g transform="translate(20 168) rotate(-50)"><path d="M0 0 C5 -10 17 -10 22 0 C17 10 5 10 0 0Z" fill="#8cc46a"/></g>
+    <g transform="translate(330 330) rotate(15)"><path d="M0 0 C5 -10 17 -10 22 0 C17 10 5 10 0 0Z" fill="#6bb04a"/></g>
+    <g transform="translate(110 340)" stroke-width="3" stroke-linecap="round">
+      <path d="M0 0 l5 -2" stroke="#f59ab7"/><path d="M40 -8 l5 2" stroke="#f7c04a"/><path d="M80 -2 l4 -3" stroke="#7ec0e6"/>
+    </g>
+    <g transform="translate(130 20)" stroke-width="3" stroke-linecap="round">
+      <path d="M0 0 l5 2" stroke="#f7c04a"/><path d="M-30 12 l4 -3" stroke="#f59ab7"/>
+    </g>
+  </g>
+</svg>
