@@ -1,9 +1,10 @@
-- [ ] Re-theme and improve the recipe discovery interface.
-- [ ] Add camera/photo ingredient recognition through the existing recipe service.
-- [ ] Make selected recipe details and clear cooking steps available from dish choices; allow typed serving counts.
-- [ ] Add optional email/password sign-in without extra profile fields; save one cooking conversation in this browser.
-- [ ] Add a streaming cooking chat and camera/photo question support.
-- [ ] Incorporate the feature photo after the user attaches it (currently unavailable).
-- [ ] Verify the complete public recipe and photo flow, then commit the changes.
-
-Decisions: sign-in needs only email and password; one conversation; browser-only chat history. The requested feature photo is not attached yet.
+- [x] Re-theme with a vegetable and dessert background, using the IngreDine logo palette.
+- [x] Separate sections: Use my ingredients, Make a specific dish, Kitchen Consultation.
+- [x] Tap a dish name to open its steps; steps written in the 7 Cs.
+- [x] Typed number of people, with quantities scaled to match.
+- [x] Photo upload, live camera and voice input for ingredients, dishes and Chef.
+- [x] Cuisine preference under the input box, ending with All Worldwide Cuisines.
+- [x] Login and chat history panel (history stored in this browser per account).
+- [x] Prep/cook time, difficulty, required/available/missing ingredients and estimated cost.
+- [x] New logo.
+- [ ] Sync chat history to the account across devices (needs private chat tables added through Lovable).
