@@ -83,7 +83,7 @@ export function safeGatewayMessage(error: unknown) {
     }
   }
 
-  if (status === 401) return "The cooking assistant is not configured yet. Please try again later.";
+  if (status === 401) return "The AI assistant needs its LOVABLE_API_KEY secret configured. Add it in Lovable Secrets or the local server environment, then restart the app.";
   if (status === 402) return upstreamMessage || "Recipe generation is paused because this workspace has no available AI credits. Add credits to continue.";
   if (status === 403) return upstreamMessage || "Recipe generation is unavailable due to an access or workspace setting.";
   if (status === 429) return "The recipe service is busy. Please wait a moment, then try again.";
@@ -97,7 +97,7 @@ export async function generateRecipes(request: Request, data: RecipeRequest): Pr
   | { ok: false; error: string }
 > {
   const apiKey = process.env["LOVABLE_API_KEY"];
-  if (!apiKey) return { ok: false, error: "The cooking assistant is not configured yet. Please try again later." };
+  if (!apiKey) return { ok: false, error: "The AI assistant needs its LOVABLE_API_KEY secret configured. Add it in Lovable Secrets or the local server environment, then restart the app." };
 
   const runIdFetch = createLovableAiGatewayRunIdFetch(getLovableAiGatewayRunId(request));
   const provider = createOpenAI({

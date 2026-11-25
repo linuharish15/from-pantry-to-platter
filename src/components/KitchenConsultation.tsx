@@ -7,11 +7,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { AuthAccount } from "@/components/AuthAccount";
 import { compressFoodPhoto } from "@/lib/image-utils";
 import { askKitchenChef } from "@/lib/recipes/consultation.functions";
+import type { ConsultationAction } from "@/lib/recipes/consultation.shared";
 
 type KitchenConsultationProps = {
   language: string;
   recipeTitle: string | undefined;
   servings: number;
+  appContext: {
+    mode: "ingredients" | "dish";
+    cuisine: string;
+    ingredients: string[];
+    dish: string;
+    recipes: string[];
+  };
+  onApplyAction: (action: ConsultationAction) => void;
 };
 
 type ChatMessage = {
@@ -20,9 +29,10 @@ type ChatMessage = {
   cautions?: string[];
   followUp?: string;
   hasPhoto?: boolean;
+  action?: ConsultationAction;
 };
 
-export function KitchenConsultation({ language, recipeTitle, servings }: KitchenConsultationProps) {
+export function KitchenConsultation({ language, recipeTitle, servings, appContext, onApplyAction }: KitchenConsultationProps) {
   const ask = useServerFn(askKitchenChef);
   const fileRef = useRef<HTMLInputElement>(null);
   const cameraRef = useRef<HTMLInputElement>(null);
@@ -138,6 +148,15 @@ export function KitchenConsultation({ language, recipeTitle, servings }: Kitchen
         language,
         recipeTitle,
         servings,
+        history: messages.slice(-10).map((message) => ({
+          role: message.role === "chef" ? "assistant" as const : "user" as const,
+          text: message.text.slice(0, 2000),
+        })),
+        appContext: {
+          ...appContext,
+          servings,
+          language,
+        },
         imageDataUrl: sentAttachment?.dataUrl,
       } });
       if (!result.ok) {
@@ -149,6 +168,7 @@ export function KitchenConsultation({ language, recipeTitle, servings }: Kitchen
         text: result.data.answer,
         cautions: result.data.cautions,
         ...(result.data.followUp ? { followUp: result.data.followUp } : {}),
+        ...(result.data.action ? { action: result.data.action } : {}),
       }]);
       setAttachment(undefined);
     } catch {
@@ -173,10 +193,10 @@ export function KitchenConsultation({ language, recipeTitle, servings }: Kitchen
     <section className="consultation-section mt-8 border-t border-border/70 pt-6" aria-labelledby="consultation-title">
       <div className="consultation-heading mb-4 flex items-start justify-between gap-4">
         <div>
-          <div className="text-[10px] font-bold uppercase text-primary">Cooking support, when you need it</div>
+          <div className="text-[10px] font-bold uppercase text-primary">Your AI assistant</div>
           <h2 id="consultation-title" className="mt-1 font-display text-[28px] leading-tight">Kitchen Consultation</h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Ask about substitutions, doneness, temperatures, allergies, preparation, timing, or the best next step.
+            Ask general questions, get cooking help, or ask how to use IngreDine. For page changes, Chef will suggest an action for you to confirm.
           </p>
         </div>
         <AuthAccount />
@@ -195,6 +215,14 @@ export function KitchenConsultation({ language, recipeTitle, servings }: Kitchen
                 </ul>
               ) : null}
               {message.followUp && <p className="mt-2 text-sm font-medium text-primary">{message.followUp}</p>}
+              {message.action && (
+                <Button type="button" variant="outline" size="sm" className="mt-3" onClick={() => { if (message.action) onApplyAction(message.action); }}>
+                  {message.action.type === "set_mode" ? `Switch to ${message.action.mode === "dish" ? "a specific dish" : "my ingredients"}` :
+                    message.action.type === "set_servings" ? `Set servings to ${message.action.servings}` :
+                      message.action.type === "set_dish" ? `Use dish: ${message.action.dish}` :
+                        message.action.ingredients.length ? `Use ${message.action.ingredients.length} ingredients` : "Clear ingredients"}
+                </Button>
+              )}
             </div>
           ))}
           {loading && <p className="mr-8 rounded-md border-l-2 border-primary bg-primary/5 px-3 py-2 text-sm text-muted-foreground">The chef is considering your question…</p>}
@@ -210,7 +238,7 @@ export function KitchenConsultation({ language, recipeTitle, servings }: Kitchen
       )}
 
       <form onSubmit={submit} className="rounded-lg border border-border bg-card p-2 shadow-sm">
-        <Textarea value={question} onChange={(event) => setQuestion(event.target.value)} rows={3} placeholder="Ask Chef about your dish…" className="min-h-[76px] resize-none border-0 shadow-none focus-visible:ring-0" />
+        <Textarea value={question} onChange={(event) => setQuestion(event.target.value)} rows={3} placeholder="Ask a question or tell Chef what to change…" className="min-h-[76px] resize-none border-0 shadow-none focus-visible:ring-0" />
         <div className="flex items-center justify-between gap-2 border-t border-border/70 pt-2">
           <div className="flex items-center gap-1">
             <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(event) => { void handleAttachment(event.target.files?.[0]); event.target.value = ""; }} />

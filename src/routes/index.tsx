@@ -8,6 +8,7 @@ import { getRecipeRequestError, recipeRequestSchema, type RecipeRequestInput } f
 import { getRecipes } from "@/lib/recipes/recipes.functions";
 import type { RecipeResponse } from "@/lib/recipes/recipes.server";
 import { KitchenConsultation } from "@/components/KitchenConsultation";
+import type { ConsultationAction } from "@/lib/recipes/consultation.shared";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -44,6 +45,25 @@ function RecipeAssistant() {
   const [response, setResponse] = useState<RecipeResponse>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const applyAssistantAction = (action: ConsultationAction) => {
+    switch (action.type) {
+      case "set_mode":
+        setMode(action.mode);
+        break;
+      case "set_servings":
+        setPeopleText(String(action.servings));
+        break;
+      case "set_dish":
+        setDish(action.dish);
+        setMode("dish");
+        break;
+      case "set_ingredients":
+        setIngredientText(action.ingredients.join(", "));
+        setMode("ingredients");
+        break;
+    }
+  };
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -187,7 +207,19 @@ function RecipeAssistant() {
           </section>
         </div>
 
-        <KitchenConsultation language={language} recipeTitle={response?.recipes[0]?.title} servings={Number(peopleText) || 2} />
+        <KitchenConsultation
+          language={language}
+          recipeTitle={response?.recipes[0]?.title}
+          servings={Number.isSafeInteger(Number(peopleText)) && Number(peopleText) > 0 ? Number(peopleText) : 2}
+          appContext={{
+            mode,
+            cuisine,
+            ingredients: ingredientText.split(/[\n,]+/).map((value) => value.trim()).filter(Boolean).slice(0, 24).map((value) => value.slice(0, 60)),
+            dish: dish.trim().slice(0, 100),
+            recipes: (response?.recipes ?? []).slice(0, 3).map((recipe) => recipe.title.slice(0, 160)),
+          }}
+          onApplyAction={applyAssistantAction}
+        />
         <footer className="mt-8 border-t border-border py-5 text-center text-sm text-muted-foreground">IngreDine — use what you have, discover recipes, cook happier.</footer>
       </div>
     </main>
