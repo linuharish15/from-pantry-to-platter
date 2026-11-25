@@ -1,5 +1,6 @@
 import type { RecipeRequestInput } from "@/lib/recipes/recipe-validation";
 import type { RecipeResponse } from "@/lib/recipes/recipes.server";
+import type { ConsultationAction } from "@/lib/recipes/consultation.shared";
 
 export type ChatMessage = {
   role: "user" | "chef";
@@ -7,6 +8,7 @@ export type ChatMessage = {
   cautions?: string[];
   followUp?: string;
   hasPhoto?: boolean;
+  action?: ConsultationAction;
 };
 
 export type RecipeHistoryEntry = {
