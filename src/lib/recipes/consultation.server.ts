@@ -3,12 +3,13 @@ import { APICallError, NoObjectGeneratedError, Output, streamText } from "ai";
 import { z } from "zod";
 
 import { createLovableAiGatewayRunIdFetch, getLovableAiGatewayRunId } from "./run-id";
+import { servingsCountSchema } from "./recipe-validation";
 
 export const consultationRequestSchema = z.object({
   question: z.string().trim().min(3).max(2000),
   language: z.string().trim().min(2).max(40).default("English"),
   recipeTitle: z.string().trim().max(160).optional(),
-  servings: z.number().int().min(1).max(100).optional(),
+  servings: servingsCountSchema.optional(),
   imageDataUrl: z.string().max(4_000_000).regex(/^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/).optional(),
 }).strict();
 

@@ -13,16 +13,20 @@ describe("recipe request limits", () => {
     expect(recipeRequestSchema.safeParse({ mode: "ingredients", ingredients, dish: "", servings: 2 }).success).toBe(false);
   });
 
-  it("accepts serving counts from 1 through 12", () => {
-    for (const servings of [1, 12]) {
+  it("accepts any positive safe whole-number serving count", () => {
+    for (const servings of [1, 12, 101, 1_000_000, Number.MAX_SAFE_INTEGER]) {
       expect(recipeRequestSchema.safeParse({ mode: "dish", ingredients: [], dish: "Biryani", servings }).success).toBe(true);
     }
   });
 
-  it("rejects serving counts outside 1 through 12", () => {
-    for (const servings of [0, 13]) {
+  it("rejects non-positive, fractional, or unsafe serving counts", () => {
+    for (const servings of [0, -1, 1.5, Number.MAX_SAFE_INTEGER + 1]) {
       expect(recipeRequestSchema.safeParse({ mode: "dish", ingredients: [], dish: "Biryani", servings }).success).toBe(false);
     }
+  });
+
+  it("does not show a maximum-count validation error for a large valid group", () => {
+    expect(getRecipeRequestError({ mode: "dish", ingredients: [], dish: "Biryani", servings: 1_000_000 })).toBeUndefined();
   });
 
   it("requires a dish name when requesting a specific recipe", () => {

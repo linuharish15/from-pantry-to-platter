@@ -12,8 +12,12 @@ import { KitchenConsultation } from "@/components/KitchenConsultation";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "IngreDine | Your Smart Kitchen Assistant" },
-      { name: "description", content: "Find dishes from your ingredients or get a complete recipe for a dish you love." },
+      { title: "IngreDine | Your Ingredients , Endless Possibilities" },
+      { name: "description", content: "Turn ingredients into worldwide dish ideas or get complete recipes with ingredients and clear cooking steps." },
+      { property: "og:title", content: "IngreDine | Your Ingredients , Endless Possibilities" },
+      { property: "og:description", content: "Turn ingredients into worldwide dish ideas or get complete recipes with ingredients and clear cooking steps." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: RecipeAssistant,
@@ -61,7 +65,7 @@ function RecipeAssistant() {
     }
     const parsed = recipeRequestSchema.safeParse(request);
     if (!parsed.success) {
-      setError("Please check your entries. Add up to 24 ingredients and choose a people count from 1 to 100.");
+              setError("Please check your entries. Add up to 24 ingredients and enter a positive whole-number people count.");
       setResponse(undefined);
       return;
     }
@@ -98,7 +102,7 @@ function RecipeAssistant() {
         </header>
 
         <section id="home" className="mb-7 rounded-2xl border border-border bg-card p-5 sm:p-8">
-          <p className="text-sm font-bold uppercase tracking-widest text-primary">Cook with what you have</p>
+          <p className="text-sm font-bold uppercase tracking-widest text-primary">Your Ingredients , Endless Possibilities</p>
           <h1 className="mt-2 font-display text-3xl font-bold sm:text-4xl">What would you like to cook?</h1>
           <p className="mt-2 max-w-2xl text-muted-foreground">Get recipe ideas from your ingredients, or ask for a complete recipe for any dish. Select a dish below to open its cooking steps.</p>
         </section>
@@ -106,8 +110,8 @@ function RecipeAssistant() {
         <div className="grid gap-6 lg:grid-cols-[minmax(300px,0.9fr)_minmax(0,1.1fr)]">
           <section className="rounded-2xl border border-border bg-card p-5 sm:p-6">
             <div className="grid grid-cols-2 gap-2 rounded-xl bg-secondary p-1" role="group" aria-label="Recipe request type">
-              <Button type="button" variant={mode === "ingredients" ? "default" : "ghost"} aria-pressed={mode === "ingredients"} onClick={() => { setMode("ingredients"); setError(""); }}>Use my ingredients</Button>
-              <Button type="button" variant={mode === "dish" ? "default" : "ghost"} aria-pressed={mode === "dish"} onClick={() => { setMode("dish"); setError(""); }}>Make a specific dish</Button>
+              <Button type="button" variant={mode === "ingredients" ? "default" : "ghost"} aria-pressed={mode === "ingredients"} onClick={() => { setMode("ingredients"); setError(""); setResponse(undefined); }}>Use my ingredients</Button>
+              <Button type="button" variant={mode === "dish" ? "default" : "ghost"} aria-pressed={mode === "dish"} onClick={() => { setMode("dish"); setError(""); setResponse(undefined); }}>Make a specific dish</Button>
             </div>
 
             <form onSubmit={submit} className="mt-5 space-y-5" noValidate>
@@ -132,8 +136,8 @@ function RecipeAssistant() {
 
               <div>
                 <label htmlFor="people-count" className="block text-sm font-semibold">How many people are you cooking for?</label>
-                <input id="people-count" type="text" inputMode="numeric" autoComplete="off" value={peopleText} onChange={(event) => { if (/^\d{0,3}$/.test(event.target.value)) setPeopleText(event.target.value); }} placeholder="Type a number (1–100)" className="mt-2 h-12 w-full rounded-lg border border-input bg-background px-3 text-base" />
-                <p className="mt-1 text-xs text-muted-foreground">Type the number yourself. Recipe quantities will be scaled for this many people.</p>
+                <input id="people-count" type="text" inputMode="numeric" autoComplete="off" value={peopleText} onChange={(event) => { if (/^\d*$/.test(event.target.value)) setPeopleText(event.target.value); }} placeholder="Type any number of people" className="mt-2 h-12 w-full rounded-lg border border-input bg-background px-3 text-base" />
+                <p className="mt-1 text-xs text-muted-foreground">Enter a whole number; recipe quantities will be scaled for your group.</p>
               </div>
 
               <div>
@@ -162,7 +166,7 @@ function RecipeAssistant() {
             {loading && <div role="status" className="rounded-2xl border border-border bg-card p-8 text-center"><p className="font-display text-xl">The chef is finding your recipe…</p><p className="mt-2 text-sm text-muted-foreground">Please keep this page open for a moment.</p></div>}
             {response && <>
               <div className="rounded-xl bg-secondary p-4"><h2 className="font-display text-xl font-bold">Your recipe ideas</h2><p className="mt-1 text-sm text-muted-foreground">{response.introduction || "Choose a dish to open its complete recipe and steps."}</p></div>
-              {response.recipes.map((recipe, index) => <details key={`${recipe.title}-${index}`} className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+              {response.recipes.map((recipe, index) => <details key={`${recipe.title}-${index}`} open={mode === "dish" && response.recipes.length === 1} className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
                 <summary className="cursor-pointer list-none p-5 hover:bg-secondary/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary">
                   <span className="block font-display text-xl font-bold text-primary sm:text-2xl">{recipe.title}</span>
                   <span className="mt-1 block text-sm text-muted-foreground">{recipe.subtitle || recipe.description}</span>

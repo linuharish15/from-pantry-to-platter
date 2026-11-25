@@ -7,4 +7,8 @@
 - [x] Login and chat history panel (history stored in this browser per account).
 - [x] Prep/cook time, difficulty, required/available/missing ingredients and estimated cost.
 - [x] New logo.
+- [ ] Add the requested “Your Ingredients , Endless Possibilities” tagline.
+- [ ] Accept any positive whole-number serving count without an arbitrary maximum warning.
+- [ ] Fix and validate recipe suggestions and complete steps for both request modes; preserve actionable gateway errors.
+- [ ] Verify both recipe paths in the preview; live AI verification is blocked if workspace credits remain unavailable.
 - [ ] Sync chat history to the account across devices (needs private chat tables added through Lovable).
