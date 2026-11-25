@@ -129,7 +129,7 @@ export async function generateRecipes(request: Request, data: RecipeRequest): Pr
   try {
     const result = streamText({
       // Use a supported Lovable gateway model; an unknown model ID causes every recipe request to fail.
-      model: provider.responses("openai/gpt-5.6-sol"),
+      model: provider.responses("openai/gpt-6-astra"),
       instructions,
       prompt,
       abortSignal: request.signal,
