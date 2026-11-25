@@ -16,6 +16,7 @@ import { WORLDWIDE_CUISINE } from "@/lib/recipes/options";
 import { getRecipeRequestError, MAX_SERVINGS, recipeRequestSchema } from "@/lib/recipes/recipe-validation";
 import { getRecipes } from "@/lib/recipes/recipes.functions";
 import type { RecipeResponse } from "@/lib/recipes/recipes.server";
+import type { ConsultationAction } from "@/lib/recipes/consultation.shared";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -206,6 +207,25 @@ function IngreDine() {
     setChatId(newId());
   };
 
+  const applyAssistantAction = (action: ConsultationAction) => {
+    switch (action.type) {
+      case "navigate":
+        setSection(action.section);
+        break;
+      case "set_servings":
+        setPeople(String(action.servings));
+        break;
+      case "set_dish":
+        setDishName(action.dish);
+        setSection("dish");
+        break;
+      case "set_ingredients":
+        setIngredients(action.ingredients);
+        setSection("ingredients");
+        break;
+    }
+  };
+
   const renderResults = (mode: Mode) => {
     const outcome = results[mode];
     if (loading === mode) {
@@ -322,9 +342,29 @@ function IngreDine() {
           <section role="tabpanel" id="panel-consult" aria-labelledby="tab-consult" className="panel panel-consult">
             <header className="panel-head">
               <h2 className="panel-title">Kitchen Consultation</h2>
-              <p className="panel-sub">Cooking and a doubt comes up? Ask Chef about substitutions, timing, doneness, spice levels or food safety.</p>
+              <p className="panel-sub">Ask general questions, get cooking help, or ask how to use IngreDine. Chef can suggest page changes for you to confirm.</p>
             </header>
-            <KitchenConsultation language={language} recipeTitle={focusTitle} servings={servings} messages={chatMessages} onMessages={(update) => setChatMessages(update)} onNewChat={startNewChat} />
+            <KitchenConsultation
+              language={language}
+              recipeTitle={focusTitle}
+              servings={servings}
+              messages={chatMessages}
+              onMessages={(update) => setChatMessages(update)}
+              onNewChat={startNewChat}
+              appContext={{
+                section,
+                cuisine,
+                ingredients,
+                dishPantry,
+                dishName,
+                selectedRecipe: focusTitle,
+                visibleRecipes: [
+                  ...(results.ingredients?.response.recipes ?? []),
+                  ...(results.dish?.response.recipes ?? []),
+                ].slice(0, 3).map((recipe) => recipe.title),
+              }}
+              onApplyAction={applyAssistantAction}
+            />
           </section>
         )}
       </main>

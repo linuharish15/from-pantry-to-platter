@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import type { ChatMessage } from "@/lib/history";
 import { compressFoodPhoto } from "@/lib/image-utils";
 import { askKitchenChef } from "@/lib/recipes/consultation.functions";
+import type { ConsultationAction } from "@/lib/recipes/consultation.shared";
 import { consultationStarters, tips } from "@/lib/recipes/options";
 
 type KitchenConsultationProps = {
@@ -17,9 +18,19 @@ type KitchenConsultationProps = {
   messages: ChatMessage[];
   onMessages: (update: (existing: ChatMessage[]) => ChatMessage[]) => void;
   onNewChat: () => void;
+  appContext: {
+    section: "ingredients" | "dish" | "consult";
+    cuisine: string;
+    ingredients: string[];
+    dishPantry: string[];
+    dishName: string;
+    selectedRecipe: string | undefined;
+    visibleRecipes: string[];
+  };
+  onApplyAction: (action: ConsultationAction) => void;
 };
 
-export function KitchenConsultation({ language, recipeTitle, servings, messages, onMessages, onNewChat }: KitchenConsultationProps) {
+export function KitchenConsultation({ language, recipeTitle, servings, messages, onMessages, onNewChat, appContext, onApplyAction }: KitchenConsultationProps) {
   const ask = useServerFn(askKitchenChef);
   const endRef = useRef<HTMLDivElement>(null);
   const [question, setQuestion] = useState("");
@@ -63,7 +74,23 @@ export function KitchenConsultation({ language, recipeTitle, servings, messages,
     setQuestion("");
 
     try {
-      const result = await ask({ data: { question: cleanQuestion, language, recipeTitle, servings, imageDataUrl: sentAttachment?.dataUrl } });
+      const result = await ask({ data: {
+        question: cleanQuestion,
+        language,
+        recipeTitle,
+        servings,
+        history: messages.slice(-10).map((message) => ({
+          role: message.role === "chef" ? "assistant" as const : "user" as const,
+          text: message.text,
+        })),
+        appContext: {
+          ...appContext,
+          servings,
+          language,
+          ...(appContext.selectedRecipe ? { selectedRecipe: appContext.selectedRecipe } : {}),
+        },
+        imageDataUrl: sentAttachment?.dataUrl,
+      } });
       if (!result.ok) {
         setError(result.error);
         return;
@@ -73,6 +100,7 @@ export function KitchenConsultation({ language, recipeTitle, servings, messages,
         text: result.data.answer,
         cautions: result.data.cautions,
         ...(result.data.followUp ? { followUp: result.data.followUp } : {}),
+        ...(result.data.action ? { action: result.data.action } : {}),
       }]);
       setAttachment(undefined);
     } catch {
@@ -107,7 +135,7 @@ export function KitchenConsultation({ language, recipeTitle, servings, messages,
           {messages.length === 0 && !loading && (
             <div className="chat-empty">
               <p className="chat-empty-title">Stuck while cooking? Ask Chef.</p>
-              <p>Try one of these, or write your own question below.</p>
+              <p>Ask a general question, get cooking help, or ask how to use IngreDine. For page changes, Chef will suggest an action for you to confirm.</p>
               <div className="starter-list">
                 {consultationStarters.map((starter) => <button key={starter} type="button" className="starter" onClick={() => void send(starter)}>{starter}</button>)}
               </div>
@@ -131,6 +159,14 @@ export function KitchenConsultation({ language, recipeTitle, servings, messages,
                   </div>
                 ) : null}
                 {message.followUp && <p className="chef-followup">{message.followUp}</p>}
+                {message.action && (
+                  <Button type="button" variant="outline" size="sm" className="mt-3" onClick={() => { if (message.action) onApplyAction(message.action); }}>
+                    {message.action.type === "navigate" ? `Open ${message.action.section === "consult" ? "Kitchen Consultation" : message.action.section === "dish" ? "Make a specific dish" : "Use my ingredients"}` :
+                      message.action.type === "set_servings" ? `Set servings to ${message.action.servings}` :
+                        message.action.type === "set_dish" ? `Use dish: ${message.action.dish}` :
+                          message.action.ingredients.length ? `Use ${message.action.ingredients.length} ingredients` : "Clear ingredients"}
+                  </Button>
+                )}
               </div>
             )
           ))}
