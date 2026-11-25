@@ -84,8 +84,7 @@ export async function generateRecipes(request: Request, data: RecipeRequest): Pr
   const apiKey = process.env["LOVABLE_API_KEY"];
   if (!apiKey) return { ok: false, error: "The cooking assistant is not configured yet. Please try again later." };
 
-  const initialRunId = getLovableAiGatewayRunId(request);
-  const runIdFetch = createLovableAiGatewayRunIdFetch(initialRunId);
+  const runIdFetch = createLovableAiGatewayRunIdFetch(getLovableAiGatewayRunId(request));
   const provider = createOpenAI({
     baseURL: "https://ai.gateway.lovable.dev/v1",
     apiKey,
@@ -98,29 +97,24 @@ export async function generateRecipes(request: Request, data: RecipeRequest): Pr
 
   const items = data.ingredients.length ? data.ingredients.join(", ") : "No ingredients provided";
   const instructions = [
-    "You are Pantry & Plate, a thoughtful, practical worldwide home-cooking assistant.",
-    `Answer in ${data.language}.`,
-    `Apply this cuisine preference: ${data.cuisine}. If All Worldwide Cuisines is selected, choose authentic dishes from any world cuisine.`,
-    "You may answer meals, desserts, snacks, sauces, drinks with culinary relevance, side dishes, and dietary variants.",
-    "Create appealing, realistic, culturally respectful recipes using the user's pantry ingredients and the exact requested serving count.",
-    "For ingredient mode, suggest exactly three distinct dishes. Favor ingredients the user already has, but never misclassify pantry ownership.",
-    "For dish mode, provide one authentic, complete recipe for the named dish.",
-    "Every ingredient quantity must be concrete and mathematically appropriate for the exact serving count.",
-    "requiredIngredients is the complete recipe list; ingredients repeats that list with quantities and haveIt flags. Keep both lists consistent.",
-    "Separate availableIngredients and missingIngredients by name. Set ingredient haveIt true only when that exact ingredient is in the user's supplied pantry list.",
-    "Estimate cost as a range and name the currency or region when possible; say when a reliable estimate is unavailable.",
-    "Provide preparation minutes, cooking minutes, total time, difficulty, estimatedCost, equipment, substitutions, and practical safety guidance.",
-    "Write steps using the 7 Cs: Clear, Concise, Concrete, Correct, Complete, Coherent, and Courteous.",
-    "Use sequential numbered steps, visible measurements, temperatures, doneness cues, and realistic cooking times. Be accurate about allergens and food safety; do not guess uncertain information.",
+    "You are IngreDine, a practical, friendly worldwide cooking assistant.",
+    `Reply in ${data.language}. Apply the cuisine preference ${data.cuisine}; All Worldwide Cuisines means any world cuisine.`,
+    "Help with all cooking-related food: main dishes, desserts, snacks, breads, drinks, sauces, side dishes, and dietary alternatives.",
+    "For ingredient requests, return exactly three distinct recipes. For a named dish, return one complete recipe for that exact dish.",
+    `Scale every ingredient quantity for exactly ${data.servings} people. Keep quantities concrete and consistent across requiredIngredients and ingredients.`,
+    "Set haveIt true only for items explicitly provided by the user. Fill availableIngredients and missingIngredients accurately.",
+    "Return realistic prep and cooking minutes, total minutes, difficulty, equipment, substitutions, approximate estimated cost, and a concise tip.",
+    "Write practical numbered cooking steps in a clear, concise, concrete, correct, complete, coherent and courteous style. Include action order, quantities, heat, time, and visible doneness cues when relevant.",
+    "Use safe cooking temperatures and do not invent facts or make unsupported allergy guarantees.",
   ].join(" ");
-
   const prompt = data.mode === "dish"
-    ? `Make a complete recipe for ${data.dish}. Cuisine preference: ${data.cuisine}. I have: ${items}. Scale every quantity for exactly ${data.servings} people. Respond in ${data.language}.`
-    : `I have these ingredients: ${items}. Cuisine preference: ${data.cuisine}. Suggest exactly three dishes I can cook, favoring recipes that use what I already have. Scale every quantity for exactly ${data.servings} people. Respond in ${data.language}.`;
+    ? `Give me the full recipe and cooking steps for ${data.dish}. I have these optional ingredients: ${items}. Make it for exactly ${data.servings} people, in ${data.language}. Cuisine preference: ${data.cuisine}.`
+    : `I have: ${items}. Give exactly three different dishes I can make, with complete recipes and cooking steps. Make each for exactly ${data.servings} people. Reply in ${data.language}. Cuisine preference: ${data.cuisine}.`;
 
   try {
     const result = streamText({
-      model: provider.responses("openai/gpt-6-astra"),
+      // Use a supported Lovable gateway model; an unknown model ID causes every recipe request to fail.
+      model: provider.responses("openai/gpt-5.6-sol"),
       instructions,
       prompt,
       abortSignal: request.signal,
@@ -135,14 +129,13 @@ export async function generateRecipes(request: Request, data: RecipeRequest): Pr
         },
       },
     });
-
-    // The Responses request streams upstream; the server consumes the complete structured result.
     const output = await result.output;
-    if (!output) return { ok: false, error: "I couldn’t prepare a complete recipe. Please try again." };
+    if (!output) return { ok: false, error: "The chef did not return a complete recipe. Please try again with a little more detail." };
     return { ok: true, data: recipeResponseSchema.parse(output) };
   } catch (error) {
     if (NoObjectGeneratedError.isInstance(error)) {
-      return { ok: false, error: "I couldn’t prepare a complete recipe. Try adding a few more details." };
+      console.error("Recipe response did not match the required recipe structure.", error.message);
+      return { ok: false, error: "The chef could not format that recipe. Please try again with a shorter dish name or ingredient list." };
     }
     if (error instanceof Error && error.name === "AbortError") {
       return { ok: false, error: "Recipe generation was stopped." };
