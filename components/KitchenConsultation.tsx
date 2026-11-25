@@ -81,7 +81,7 @@ export function KitchenConsultation({ language, recipeTitle, servings, messages,
         servings,
         history: messages.slice(-10).map((message) => ({
           role: message.role === "chef" ? "assistant" as const : "user" as const,
-          text: message.text,
+          text: message.text.slice(0, 2000),
         })),
         appContext: {
           ...appContext,
